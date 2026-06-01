@@ -4,7 +4,7 @@
 }
 
 body {
-  width: 320px;
+  width: 220px;
   margin: 0;
   background: Canvas;
   color: CanvasText;
@@ -20,27 +20,9 @@ h1 {
   margin: 0 0 12px;
 }
 
-label {
-  display: block;
-  font-size: 12px;
-  font-weight: 650;
-  margin-bottom: 6px;
-}
-
-textarea {
-  box-sizing: border-box;
-  width: 100%;
-  resize: vertical;
-  border: 1px solid color-mix(in srgb, CanvasText 24%, Canvas);
-  border-radius: 6px;
-  padding: 8px;
-  font: inherit;
-}
-
 .actions {
   display: flex;
   gap: 8px;
-  margin-top: 10px;
 }
 
 button {
@@ -51,10 +33,6 @@ button {
   padding: 7px 10px;
   font: inherit;
   cursor: pointer;
-}
-
-#save {
-  font-weight: 650;
 }
 
 #status {

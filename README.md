@@ -4,7 +4,7 @@ Local-first attention analytics for developers and ADHD-friendly workflows.
 
 Attention Debugger records browser tab activity and optional macOS app focus into a local SQLite database, then helps you inspect where your attention went. The first MVP is intentionally small:
 
-- Chrome extension captures active tabs, URL/domain, title, idle state, and current task.
+- Chrome extension captures active tabs, URL/domain, title, and idle state.
 - Native Messaging host writes events to local SQLite.
 - macOS app tracker can log foreground app/window changes.
 - Local dashboard summarizes app and site usage.
@@ -57,19 +57,11 @@ Chrome requires the native host manifest to explicitly allow the extension ID.
 
 ## Use
 
-Click the extension icon and set a current task, such as:
-
-```text
-Implement billing webhook retry tests
-```
-
-The extension will record active tab changes and idle state. To also log macOS foreground app/window activity:
+The extension records active tab changes and idle state. To also log macOS foreground app/window activity:
 
 ```bash
 python3 scripts/app_tracker_macos.py
 ```
-
-The current task is an intent label. It is attached to browser events so the review tools can compare what you meant to do with where your tabs actually went. For example, a task like "Fix webhook retry tests" makes later drift analysis much more useful than raw domain totals.
 
 Start the local dashboard:
 
@@ -107,14 +99,12 @@ Browser events may include:
 - domain
 - tab title
 - active window/tab IDs
-- current task
 - idle state
 
 macOS app events may include:
 
 - foreground app name
 - window title
-- current task
 
 ## Privacy Notes
 

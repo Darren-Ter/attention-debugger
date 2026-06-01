@@ -26,7 +26,6 @@ CREATE TABLE IF NOT EXISTS events (
   tab_id INTEGER,
   window_id INTEGER,
   idle_state TEXT,
-  current_task TEXT,
   payload_json TEXT NOT NULL
 );
 
@@ -34,7 +33,6 @@ CREATE INDEX IF NOT EXISTS idx_events_occurred_at ON events(occurred_at);
 CREATE INDEX IF NOT EXISTS idx_events_source ON events(source);
 CREATE INDEX IF NOT EXISTS idx_events_domain ON events(domain);
 CREATE INDEX IF NOT EXISTS idx_events_app_name ON events(app_name);
-CREATE INDEX IF NOT EXISTS idx_events_current_task ON events(current_task);
 """
 
 
@@ -84,7 +82,6 @@ def normalize_event(message):
     "tab_id": event.get("tab_id"),
     "window_id": event.get("window_id"),
     "idle_state": event.get("idle_state"),
-    "current_task": event.get("current_task"),
     "payload_json": json.dumps(event, sort_keys=True, separators=(",", ":"))
   }
 
@@ -94,10 +91,10 @@ def insert_event(connection, event):
     """
     INSERT INTO events (
       occurred_at, source, event_type, app_name, window_title, url, domain,
-      title, tab_id, window_id, idle_state, current_task, payload_json
+      title, tab_id, window_id, idle_state, payload_json
     ) VALUES (
       :occurred_at, :source, :event_type, :app_name, :window_title, :url, :domain,
-      :title, :tab_id, :window_id, :idle_state, :current_task, :payload_json
+      :title, :tab_id, :window_id, :idle_state, :payload_json
     )
     """,
     event,

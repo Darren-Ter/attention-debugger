@@ -62,7 +62,7 @@ def top_apps():
 def recent_events():
   return rows_for_query(
     """
-    SELECT occurred_at, source, event_type, domain, title, app_name, window_title, current_task
+    SELECT occurred_at, source, event_type, domain, title, app_name, window_title
     FROM events
     ORDER BY occurred_at DESC
     LIMIT 80
@@ -103,7 +103,6 @@ def render_home():
       ("title", "Title"),
       ("app_name", "App"),
       ("window_title", "Window"),
-      ("current_task", "Task"),
     ],
   )
 

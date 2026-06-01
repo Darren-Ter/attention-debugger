@@ -28,7 +28,6 @@ CREATE TABLE IF NOT EXISTS events (
   tab_id INTEGER,
   window_id INTEGER,
   idle_state TEXT,
-  current_task TEXT,
   payload_json TEXT NOT NULL
 );
 """

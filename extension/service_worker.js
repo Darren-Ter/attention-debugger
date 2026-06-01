@@ -14,11 +14,6 @@ function domainFromUrl(url) {
   }
 }
 
-async function getCurrentTask() {
-  const stored = await chrome.storage.local.get(["currentTask"]);
-  return stored.currentTask || "";
-}
-
 function sendNative(message) {
   chrome.runtime.sendNativeMessage(HOST_NAME, message, (response) => {
     if (chrome.runtime.lastError) {
@@ -36,7 +31,6 @@ async function recordTabEvent(eventType, tab) {
     return;
   }
 
-  const currentTask = await getCurrentTask();
   const event = {
     source: "chrome-extension",
     event_type: eventType,
@@ -45,8 +39,7 @@ async function recordTabEvent(eventType, tab) {
     domain: domainFromUrl(tab.url),
     title: tab.title || "",
     tab_id: tab.id,
-    window_id: tab.windowId,
-    current_task: currentTask
+    window_id: tab.windowId
   };
 
   sendNative({ type: "event", event });
@@ -85,16 +78,14 @@ chrome.windows.onFocusChanged.addListener(async (windowId) => {
 });
 
 chrome.idle.setDetectionInterval(60);
-chrome.idle.onStateChanged.addListener(async (state) => {
-  const currentTask = await getCurrentTask();
+chrome.idle.onStateChanged.addListener((state) => {
   sendNative({
     type: "event",
     event: {
       source: "chrome-extension",
       event_type: "idle_state_changed",
       occurred_at: nowIso(),
-      idle_state: state,
-      current_task: currentTask
+      idle_state: state
     }
   });
 });

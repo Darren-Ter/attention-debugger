@@ -31,8 +31,7 @@ def main():
       "occurred_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
       "domain": "example.com",
       "title": "Attention Debugger test event",
-      "url": "https://example.com/",
-      "current_task": "Verify native host writes SQLite"
+      "url": "https://example.com/"
     }
   }
   result = subprocess.run([str(HOST)], input=encode(event), capture_output=True)
