@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import os
+import plistlib
 import sqlite3
 import subprocess
 import time
@@ -35,15 +36,24 @@ CREATE TABLE IF NOT EXISTS events (
 
 APPLESCRIPT = """
 tell application "System Events"
-  set frontApp to name of first application process whose frontmost is true
+  set frontProcess to first application process whose frontmost is true
+  set frontApp to name of frontProcess
+  set frontBundleId to ""
+  set frontAppPath to ""
   set frontTitle to ""
+  try
+    set frontBundleId to bundle identifier of frontProcess
+  end try
+  try
+    set frontAppPath to POSIX path of (application file of frontProcess as alias)
+  end try
   try
     tell process frontApp
       set frontTitle to name of front window
     end tell
   end try
 end tell
-return frontApp & "\n" & frontTitle
+return frontApp & "\n" & frontBundleId & "\n" & frontAppPath & "\n" & frontTitle
 """
 
 
@@ -58,6 +68,23 @@ def connect_db():
   return connection
 
 
+def display_name_for_app(process_name, app_path):
+  if not app_path:
+    return process_name
+
+  path = Path(app_path)
+  info_plist = path / "Contents" / "Info.plist"
+  if info_plist.exists():
+    try:
+      with info_plist.open("rb") as file:
+        info = plistlib.load(file)
+      return info.get("CFBundleDisplayName") or info.get("CFBundleName") or path.stem or process_name
+    except Exception:
+      pass
+
+  return path.stem or process_name
+
+
 def current_frontmost_app():
   result = subprocess.run(
     ["osascript", "-e", APPLESCRIPT],
@@ -66,18 +93,24 @@ def current_frontmost_app():
     text=True,
   )
   lines = result.stdout.splitlines()
-  app_name = lines[0] if lines else ""
-  window_title = lines[1] if len(lines) > 1 else ""
-  return app_name, window_title
+  process_name = lines[0] if lines else ""
+  bundle_id = lines[1] if len(lines) > 1 else ""
+  app_path = lines[2] if len(lines) > 2 else ""
+  window_title = lines[3] if len(lines) > 3 else ""
+  app_name = display_name_for_app(process_name, app_path)
+  return app_name, window_title, process_name, bundle_id, app_path
 
 
-def insert_event(connection, app_name, window_title):
+def insert_event(connection, app_name, window_title, process_name, bundle_id, app_path):
   event = {
     "occurred_at": now_iso(),
     "source": "macos-app-tracker",
     "event_type": "foreground_app_changed",
     "app_name": app_name,
     "window_title": window_title,
+    "process_name": process_name,
+    "bundle_id": bundle_id,
+    "app_path": app_path,
   }
   connection.execute(
     """
@@ -99,10 +132,10 @@ def main():
 
   while True:
     try:
-      app_name, window_title = current_frontmost_app()
+      app_name, window_title, process_name, bundle_id, app_path = current_frontmost_app()
       current = (app_name, window_title)
       if current != last_seen:
-        insert_event(connection, app_name, window_title)
+        insert_event(connection, app_name, window_title, process_name, bundle_id, app_path)
         print(f"{now_iso()} {app_name} - {window_title}")
         last_seen = current
     except KeyboardInterrupt:

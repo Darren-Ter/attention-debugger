@@ -69,6 +69,8 @@ The extension will record active tab changes and idle state. To also log macOS f
 python3 scripts/app_tracker_macos.py
 ```
 
+The current task is an intent label. It is attached to browser events so the review tools can compare what you meant to do with where your tabs actually went. For example, a task like "Fix webhook retry tests" makes later drift analysis much more useful than raw domain totals.
+
 Start the local dashboard:
 
 ```bash
