@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Attention Debugger",
+  "description": "Local-first browser attention tracker using Native Messaging and SQLite.",
+  "version": "0.1.0",
+  "permissions": ["tabs", "storage", "nativeMessaging", "idle"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "action": {
+    "default_title": "Attention Debugger",
+    "default_popup": "popup.html"
+  }
+}
